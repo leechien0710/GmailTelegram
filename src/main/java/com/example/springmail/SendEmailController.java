@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -43,9 +44,14 @@ public class SendEmailController {
     private static Gmail client;
     GoogleClientSecrets clientSecrets;
     GoogleAuthorizationCodeFlow flow;
-    private String clientId ="733009833974-m6ttpe8r9uih2qu3g1la021rqrc4f1ju.apps.googleusercontent.com";
-    private String clientSecret = "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";
-    private String redirectUri = "http://localhost:8080/Callback";
+    @Value("${google.clientId}")
+    private String clientId;
+
+    @Value("${google.clientSecret}")
+    private String clientSecret;
+
+    @Value("${google.redirectUri}")
+    private String redirectUri;
     private String oauth2CallbackCode;
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private Credential credential;
