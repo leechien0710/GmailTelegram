@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 public class Account {
@@ -22,11 +23,10 @@ public class Account {
 
     private String accountHolder;
 
-    private String bankName;
 
     private float balance;
 
-    private LocalDateTime lastUpdated;
+    private Date lastUpdated;
 
     private String accountName;
 
@@ -72,14 +72,6 @@ public class Account {
         this.accountHolder = accountHolder;
     }
 
-    public String getBankName() {
-        return bankName;
-    }
-
-    public void setBankName(String bankName) {
-        this.bankName = bankName;
-    }
-
     public float getBalance() {
         return balance;
     }
@@ -88,11 +80,11 @@ public class Account {
         this.balance = balance;
     }
 
-    public LocalDateTime getLastUpdated() {
+    public Date getLastUpdated() {
         return lastUpdated;
     }
 
-    public void setLastUpdated(LocalDateTime lastUpdated) {
+    public void setLastUpdated(Date lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 
