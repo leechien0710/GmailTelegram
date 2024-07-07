@@ -5,8 +5,8 @@ import com.example.springmail.dto.SaveUserDto;
 import com.example.springmail.dto.respone.SaveUserRes;
 import com.example.springmail.entity.User;
 import com.example.springmail.repository.UserRepository;
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {

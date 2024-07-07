@@ -7,8 +7,8 @@ import com.example.springmail.entity.Account;
 import com.example.springmail.entity.Bank;
 import com.example.springmail.repository.AccountRepository;
 import com.example.springmail.repository.BankRepository;
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
@@ -20,7 +20,7 @@ public class AccountService {
     private BankRepository bankRepository;
     public SaveAccountRes saveAccount(SaveAccountDto  saveAccountDto){
         Account account = new Account();
-        Bank bank = bankRepository.findByName(saveAccountDto.getBankName());
+        Bank bank = bankRepository.findByBankName(saveAccountDto.getBankName());
         if(bank == null){
             return new SaveAccountRes(new HttpRes("400","Bank Not Found"));
         }

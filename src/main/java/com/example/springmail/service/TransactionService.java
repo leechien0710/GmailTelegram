@@ -5,8 +5,8 @@ import com.example.springmail.dto.GetTransactionDto;
 import com.example.springmail.dto.respone.GetTransactionRes;
 import com.example.springmail.entity.Transaction;
 import com.example.springmail.repository.TransactionRepository;
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -17,5 +17,8 @@ public class TransactionService {
     public GetTransactionRes getByAccountID(GetTransactionDto getTransactionDto){
             List<Transaction> transactions = transactionRepository.findByAccountId(getTransactionDto.getAccountId());
                 return new GetTransactionRes(transactions);
+    }
+    public void createTransaction(String email){
+
     }
 }

@@ -1,6 +1,8 @@
 
 package com.example.springmail;
 
+import com.example.springmail.entity.Transaction;
+import com.example.springmail.service.TransactionService;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
@@ -40,6 +42,8 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 public class SendEmailController {
+    @Autowired
+    private TransactionService transactionService;
     private static final String APPLICATION_NAME = "GmailAlexa";
     private static HttpTransport httpTransport;
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -134,11 +138,36 @@ public class SendEmailController {
                     }
                 }
             }
-            int startIndex = body.indexOf("Số dư mới của tài khoản trên là");
+            int startIndex = body.indexOf("ACB trân trọng thông báo");
             int endIndex = body.indexOf("Cảm ơn Quý khách hàng đã sử dụng Sản phẩm/ Dịch vụ của ACB");
             if (startIndex != -1 && endIndex != -1) {
-                String transactionInfo = body.substring(startIndex, endIndex);
-                this.telegramService.sendMail(transactionInfo);
+                String transactionInfo = body.substring(startIndex, endIndex).replace("*","");
+                // Extract account number
+                String accountKeyword = "tài khoản ";
+                int accountStartIndex = transactionInfo.indexOf(accountKeyword) + accountKeyword.length();
+                int accountEndIndex = transactionInfo.indexOf(" ", accountStartIndex);
+                String accountNumber = transactionInfo.substring(accountStartIndex, accountEndIndex);
+                // Extract new balance
+                String balanceKeyword = "Số dư mới của tài khoản trên là: ";
+                int balanceStartIndex = transactionInfo.indexOf(balanceKeyword) + balanceKeyword.length();
+                int balanceEndIndex = transactionInfo.indexOf(" VND", balanceStartIndex);
+                String newBalance = transactionInfo.substring(balanceStartIndex, balanceEndIndex);
+
+                // Extract transaction amount
+                String amountKeyword = "Giao dịch mới nhất:Ghi nợ -";
+                if(transactionInfo.indexOf(amountKeyword) == -1){
+                    amountKeyword = "Giao dịch mới nhất:Ghi có +";
+                }
+                int amountStartIndex = transactionInfo.indexOf(amountKeyword) + amountKeyword.length();
+                int amountEndIndex = transactionInfo.indexOf(" VND", amountStartIndex);
+                String transactionAmount = transactionInfo.substring(amountStartIndex, amountEndIndex);
+
+                // Extract transaction content
+                String contentKeyword = "Nội dung giao dịch: ";
+                int contentStartIndex = transactionInfo.indexOf(contentKeyword) + contentKeyword.length();
+                String transactionContent = transactionInfo.substring(contentStartIndex);
+
+//                this.telegramService.sendMail(transactionInfo);
             }
         } catch (Exception var15) {
             if(checkRefresh == true){
