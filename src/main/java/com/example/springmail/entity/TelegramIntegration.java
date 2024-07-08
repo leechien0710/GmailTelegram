@@ -17,7 +17,7 @@ public class TelegramIntegration {
 
     private String event; // Tiền vào, Tiền ra, Cả 2
 
-    private Long accountId;
+    private String accountNumber;
 
     private String telegramChatId;
 
@@ -49,12 +49,12 @@ public class TelegramIntegration {
         this.event = event;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public String getAccountNumber() {
+        return accountNumber;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
     }
 
     public String getTelegramChatId() {

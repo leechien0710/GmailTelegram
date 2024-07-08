@@ -1,7 +1,9 @@
 
 package com.example.springmail;
 
+import com.example.springmail.entity.TelegramIntegration;
 import com.example.springmail.entity.Transaction;
+import com.example.springmail.repository.TelegramIntegrationRepository;
 import com.example.springmail.service.TransactionService;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
@@ -25,11 +27,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,10 +44,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.swing.plaf.metal.MetalIconFactory;
+
 @RestController
 public class SendEmailController {
     @Autowired
     private TransactionService transactionService;
+    @Autowired
+    TelegramIntegrationRepository telegramIntegrationRepository;
     private static final String APPLICATION_NAME = "GmailAlexa";
     private static HttpTransport httpTransport;
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -146,12 +154,12 @@ public class SendEmailController {
                 String accountKeyword = "tài khoản ";
                 int accountStartIndex = transactionInfo.indexOf(accountKeyword) + accountKeyword.length();
                 int accountEndIndex = transactionInfo.indexOf(" ", accountStartIndex);
-                String accountNumber = transactionInfo.substring(accountStartIndex, accountEndIndex);
+                String accountNumber = transactionInfo.substring(accountStartIndex, accountEndIndex).trim();
                 // Extract new balance
                 String balanceKeyword = "Số dư mới của tài khoản trên là: ";
                 int balanceStartIndex = transactionInfo.indexOf(balanceKeyword) + balanceKeyword.length();
                 int balanceEndIndex = transactionInfo.indexOf(" VND", balanceStartIndex);
-                String newBalance = transactionInfo.substring(balanceStartIndex, balanceEndIndex);
+                String newBalance = transactionInfo.substring(balanceStartIndex, balanceEndIndex).trim();
 
                 // Extract transaction amount
                 String amountKeyword = "Giao dịch mới nhất:Ghi nợ -";
@@ -160,14 +168,21 @@ public class SendEmailController {
                 }
                 int amountStartIndex = transactionInfo.indexOf(amountKeyword) + amountKeyword.length();
                 int amountEndIndex = transactionInfo.indexOf(" VND", amountStartIndex);
-                String transactionAmount = transactionInfo.substring(amountStartIndex, amountEndIndex);
+                String transactionAmount = transactionInfo.substring(amountStartIndex, amountEndIndex).trim();
 
                 // Extract transaction content
                 String contentKeyword = "Nội dung giao dịch: ";
                 int contentStartIndex = transactionInfo.indexOf(contentKeyword) + contentKeyword.length();
                 String transactionContent = transactionInfo.substring(contentStartIndex);
-
+                Transaction transaction = new Transaction(newBalance,transactionAmount, LocalDateTime.now(),transactionContent,0,transactionInfo,accountNumber);
+                transactionService.createTransaction(transaction);
 //                this.telegramService.sendMail(transactionInfo);
+                List<TelegramIntegration> telegramIntegrations = new ArrayList<>();
+                telegramIntegrations = telegramIntegrationRepository.findByAccountNumber(accountNumber);
+                for(TelegramIntegration telegramIntegration : telegramIntegrations){
+                    String chatId = telegramIntegration.getTelegramChatId();
+                    telegramService.sendMail(transactionInfo,chatId);
+                }
             }
         } catch (Exception var15) {
             if(checkRefresh == true){

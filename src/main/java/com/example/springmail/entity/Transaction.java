@@ -14,9 +14,9 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private float inOut; // Tiền vào hoặc ra
+    private String inOut; // Tiền vào hoặc ra
 
-    private float cumulative; // Lũy kế
+    private String cumulative; // Lũy kế
 
     private LocalDateTime timestamp; // Thời gian giao dịch
 
@@ -26,9 +26,19 @@ public class Transaction {
 
     private String details; // Chi tiết giao dịch
 
-    private Long accountId; // ID của tài khoản liên quan đến giao dịch
+    private String accountNumber; // ID của tài khoản liên quan đến giao dịch
 
     // Các getters và setters (có thể sử dụng lombok để tự động sinh)
+    public Transaction() {}
+    public Transaction(String inOut, String cumulative, LocalDateTime timestamp, String content, int activity, String details, String accountNumber) {
+        this.inOut = inOut;
+        this.cumulative = cumulative;
+        this.timestamp = timestamp;
+        this.content = content;
+        this.activity = activity;
+        this.details = details;
+        this.accountNumber = accountNumber;
+    }
 
     public Long getId() {
         return id;
@@ -38,19 +48,19 @@ public class Transaction {
         this.id = id;
     }
 
-    public float getInOut() {
+    public String getInOut() {
         return inOut;
     }
 
-    public void setInOut(float inOut) {
+    public void setInOut(String inOut) {
         this.inOut = inOut;
     }
 
-    public float getCumulative() {
+    public String getCumulative() {
         return cumulative;
     }
 
-    public void setCumulative(float cumulative) {
+    public void setCumulative(String cumulative) {
         this.cumulative = cumulative;
     }
 
@@ -86,12 +96,16 @@ public class Transaction {
         this.details = details;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public String getAccountNumber() {
+        return accountNumber;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    public void setActivity(int activity) {
+        this.activity = activity;
     }
 }
 
