@@ -18,7 +18,5 @@ public class TransactionService {
             List<Transaction> transactions = transactionRepository.findByAccountId(getTransactionDto.getAccountId());
                 return new GetTransactionRes(transactions);
     }
-    public void createTransaction(String email){
 
-    }
 }

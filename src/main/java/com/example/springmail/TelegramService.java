@@ -37,9 +37,9 @@ public class TelegramService extends TelegramLongPollingBot {
         return "7173659220:AAFmntHZMZjz-VbwSAKojqkjwUfJcCUJJ4Q";
     }
 
-    public void sendMail(String mes) {
+    public void sendMail(String mes,String chatId) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId("-1002101694241");
+        sendMessage.setChatId(chatId);
         sendMessage.setText(mes);
 
         try {

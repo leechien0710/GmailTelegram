@@ -20,6 +20,7 @@ public class UserService {
             userRepository.save(user);
         }
         catch (Exception e) {
+            e.printStackTrace();
             return new SaveUserRes(new HttpRes("400", "Save User Error"));
         }
         return new SaveUserRes(new HttpRes("200", "Success"));
