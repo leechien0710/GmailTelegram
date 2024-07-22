@@ -1,13 +1,13 @@
 package com.example.springmail.dto;
 
 public class GetTransactionDto {
-    private Long accountId;
+    private String accountNumber;
 
-    public Long getAccountId() {
-        return accountId;
+    public String getAccountNumber() {
+        return accountNumber;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
     }
 }

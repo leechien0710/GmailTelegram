@@ -17,6 +17,6 @@ public class TransactionController {
     TransactionService transactionService;
     @PostMapping("get-by-account")
     public ResponseEntity<GetTransactionRes> getTransactionByAccountId(@RequestBody GetTransactionDto getTransactionDto) {
-        return ResponseEntity.ok(transactionService.getByAccountID(getTransactionDto));
+        return ResponseEntity.ok(transactionService.getByAccountNumber(getTransactionDto));
     }
 }

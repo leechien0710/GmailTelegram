@@ -14,9 +14,11 @@ import java.util.List;
 public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
-    public GetTransactionRes getByAccountID(GetTransactionDto getTransactionDto){
-            List<Transaction> transactions = transactionRepository.findByAccountId(getTransactionDto.getAccountId());
+    public GetTransactionRes getByAccountNumber(GetTransactionDto getTransactionDto){
+            List<Transaction> transactions = transactionRepository.findByAccountNumber(getTransactionDto.getAccountNumber());
                 return new GetTransactionRes(transactions);
     }
-
+    public void createTransaction(Transaction transaction){
+        transactionRepository.save(transaction);
+    }
 }
