@@ -27,10 +27,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.core.Local;
@@ -48,6 +51,7 @@ import javax.swing.plaf.metal.MetalIconFactory;
 
 @RestController
 public class SendEmailController {
+    private Logger log = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private TransactionService transactionService;
     @Autowired
@@ -57,7 +61,6 @@ public class SendEmailController {
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static Gmail client;
     GoogleClientSecrets clientSecrets;
-    private boolean checkRefresh = true;
     private static GoogleAuthorizationCodeFlow flow;
     @Value("${google.clientId}")
     private String clientId;
@@ -110,6 +113,7 @@ public class SendEmailController {
     }
     @GetMapping({"/home"})
     private void oauth2CallbackLogic() throws GeneralSecurityException, IOException {
+        log.info("Starting oauth2CallbackLogic method");
         String body = "";
         try {
             client = (new Gmail.Builder(httpTransport, JSON_FACTORY, this.credential)).setApplicationName("GmailAlexa").build();
@@ -129,7 +133,6 @@ public class SendEmailController {
                         String messageId = message.getId();
                         detailedMessage = (Message)client.users().messages().get(userId, messageId).execute();
                         long time = detailedMessage.getInternalDate();
-                        Date sentDate = new Date(time);
                         if (time == this.timebefore) {
                             return ;
                         }
@@ -162,9 +165,9 @@ public class SendEmailController {
                 String newBalance = transactionInfo.substring(balanceStartIndex, balanceEndIndex).trim();
 
                 // Extract transaction amount
-                String amountKeyword = "Giao dịch mới nhất:Ghi nợ -";
+                String amountKeyword = "Giao dịch mới nhất:Ghi nợ ";
                 if(transactionInfo.indexOf(amountKeyword) == -1){
-                    amountKeyword = "Giao dịch mới nhất:Ghi có +";
+                    amountKeyword = "Giao dịch mới nhất:Ghi có ";
                 }
                 int amountStartIndex = transactionInfo.indexOf(amountKeyword) + amountKeyword.length();
                 int amountEndIndex = transactionInfo.indexOf(" VND", amountStartIndex);
@@ -174,31 +177,23 @@ public class SendEmailController {
                 String contentKeyword = "Nội dung giao dịch: ";
                 int contentStartIndex = transactionInfo.indexOf(contentKeyword) + contentKeyword.length();
                 String transactionContent = transactionInfo.substring(contentStartIndex);
-                Transaction transaction = new Transaction(newBalance,transactionAmount, LocalDateTime.now(),transactionContent,0,transactionInfo,accountNumber);
+                Transaction transaction = new Transaction(newBalance,transactionAmount, LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(timebefore),
+                        TimeZone.getDefault().toZoneId()
+                ),transactionContent,0,transactionInfo,accountNumber);
                 transactionService.createTransaction(transaction);
-//                this.telegramService.sendMail(transactionInfo);
-                List<TelegramIntegration> telegramIntegrations = new ArrayList<>();
+                log.info("Transaction saved.");
+                List<TelegramIntegration> telegramIntegrations;
                 telegramIntegrations = telegramIntegrationRepository.findByAccountNumber(accountNumber);
+                log.info("Found {} Telegram integrations for account number: {}", telegramIntegrations.size(), accountNumber);
                 for(TelegramIntegration telegramIntegration : telegramIntegrations){
                     String chatId = telegramIntegration.getTelegramChatId();
                     telegramService.sendMail(transactionInfo,chatId);
+                    log.info("Sent transaction info to Telegram chat ID: {}", chatId);
                 }
             }
         } catch (Exception var15) {
-            if(checkRefresh == true){
-                var15.printStackTrace();
-                System.out.println("Phải refresh nha");
-                System.out.println("refresh thất bại, lắng nghe: " + this.credential.getRefreshListeners());
-                System.out.println("refresh token trước khi refres: " + this.credential.getRefreshToken());
-            }
-            if(this.credential.refreshToken()) {
-                checkRefresh = true;
-            }
-            else {
-                if( checkRefresh==true ){
-                checkRefresh = false;
-                }
-            }
+            log.error("An error occurred in oauth2CallbackLogic: ", var15);
         }
     }
     @Scheduled(
