@@ -46,6 +46,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.swing.plaf.metal.MetalIconFactory;
 
@@ -203,8 +205,5 @@ public class SendEmailController {
         if (this.credential != null) {
             this.oauth2CallbackLogic();
         }
-    }
-    private RedirectView NoAuth(){
-        return new RedirectView("/", true);
     }
 }

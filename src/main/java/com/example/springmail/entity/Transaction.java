@@ -1,9 +1,6 @@
 package com.example.springmail.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -13,17 +10,17 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(columnDefinition = "TEXT")
     private String inOut; // Tiền vào hoặc ra
-
+    @Column(columnDefinition = "TEXT")
     private String cumulative; // Lũy kế
 
     private LocalDateTime timestamp; // Thời gian giao dịch
-
+    @Column(columnDefinition = "TEXT")
     private String content; // Nội dung giao dịch
 
     private int activity; // Hoạt động (Gửi tin tele: 0 1 2)
-
+    @Column(columnDefinition = "TEXT")
     private String details; // Chi tiết giao dịch
 
     private String accountNumber; // ID của tài khoản liên quan đến giao dịch
